@@ -44,3 +44,4 @@ TODO
  - generate second step
  - cool design (?)
  - replace mysql to mongodb
+ - remove all php
