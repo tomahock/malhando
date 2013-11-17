@@ -8,6 +8,8 @@
 
 //session_start();
 
+require_once( 'configure.php' );
+require_once( 'db.php' );
 require_once( 'actions.php' );
 function pre_print_r( $foo )
 {

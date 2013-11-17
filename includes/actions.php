@@ -6,9 +6,9 @@
  * Time: 15:04
  */
 
-require_once( 'configure.php' );
+
 require_once( 'base.php' );
-require_once( 'db.php' );
+
 
 /**
  * @param $data
@@ -167,6 +167,9 @@ function printGames()
 			case 29: $html .= "<h1>STEP 4 </h1>";
 				$html .= "<div class='row'>";
 				break;
+			case 31: $html .= "<h1>FINAL</h1>";
+				$html .= "<div class='row'>";
+				break;
 		}
 		$query = "
 			SELECT name FROM teams
@@ -183,7 +186,7 @@ function printGames()
 			$html .= "</p>";
 			$html .= "<p>";
 				$html .= "Team 2 - " . $names[1]->name;
-				$html .= "  <span class='js-team-2 score2'>{$match->score1}</span>";
+				$html .= "  <span class='js-team-2 score2'>{$match->score2}</span>";
 			$html .= "</p>";
 		$html .= "</div>";
 
@@ -205,25 +208,35 @@ function printGamesAdmin()
 		SELECT * FROM game
 	";
 	$db->query( $query );
+	$allGames = $db->get();
+
+	$currentStep = end($allGames);
+	$currentStep = $currentStep->step;
+
+	$query = "
+		SELECT * FROM game
+		WHERE step = '{$currentStep}'
+	";
+
+	$db->query( $query );
 	$games = $db->get();
 
-	$currentStep = end($games);
-	$currentStep = $currentStep->step;
 	$i = 1;
 	$html = '';
 	foreach( $games as $match ) {
-		if( $match->step !== $currentStep ) {
+		if( $match->step != $currentStep ) {
 			continue;
 		}
 		$query = "
-			SELECT name FROM teams
+			SELECT * FROM teams
 			WHERE id='{$match->team1}' OR id='{$match->team2}'
 		";
+
 		$db->query( $query );
 		$names = $db->get();
 
 		$html .= "<div class='row'>";
-			$html .= "<div class='js-game col-md-8' data-id='{$match->id}'>";
+			$html .= "<div class='js-game col-md-8 js-game-id' data-id='{$match->id}'>";
 				$html .= "<p>";
 					$html .= "Team 1 - " . $names[0]->name;
 					$html .= "  <span class='js-team-1 score1'>{$match->score1}</span>";

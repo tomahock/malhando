@@ -80,3 +80,13 @@ $('.js-add-point').on('click', function(e){
 	console.log( data );
 	socket.emit( 'addPoint', data );
 });
+
+$('.js-end-game').on('click', function(e){
+	$this = $(e.currentTarget);
+	gameId = $this.parent().parent().find('.js-game-id').data( 'id' );
+	console.log( 'click' );
+	data = {
+		'gameId' :gameId
+	}
+	socket.emit( 'endGame', data );
+});

@@ -4,6 +4,7 @@ var app = require('http').createServer(handler)
 var clients = [];
 var ss;
 
+var END_GAME_POINTS = 9;
 var mysql      = require('mysql');
 var connection = mysql.createConnection({
 	host     : 'localhost',
@@ -11,18 +12,6 @@ var connection = mysql.createConnection({
 	password : 'm@lh@',
 	database : 'malha'
 });
-
-//var pool  = mysql.createPool({
-//	host     : 'localhost',
-//	user     : 'malha',
-//	password : 'm@lh@',
-//	database : 'malha'
-//});
-
-//pool.getConnection(function(err, connection) {
-	// connected! (unless `err` is set)
-//	console.log( err );
-//});
 
 app.listen(3000);
 
@@ -75,43 +64,35 @@ function Game( socket ) {
 		self.socket.broadcast.emit( 'addPoint', data );
 		self.socket.emit( 'addPoint', data );
 
-//		connection.end();
-//
-
-//
-//		console.log( 'startGame 2' );
-//		console.log( instance.team1id );
-//		sql = 'SELECT * FROM teams WHERE name="' + data.team2 + '"';
-//		connection.query( sql , function( err, rows, fields) {
-//			console.log( err );
-//			console.log( rows );
-//			instance.team2id = rows[0].id;
-//			connection.end();
-//		});
-//
-//
-//		console.log( 'startGame 3' );
-//		console.log( instance.team1id );
-//		data = {
-//			team1 : instance.team1id,
-//			team2 : instance.team2id,
-//			score1: 0,
-//			score2: 0
-//		};
-//		sql = 'INSERT INTO game( team1, team2, score1, score2) values("'+instance.team1id+'", "'+instance.team2id+'", 0, 0';
-//		console.log( sql );
-//		connection.query( sql, function(err, result) {
-//			console.log( err );
-//			connection.end();
-//		});
-
 	} );
-	this.socket.on( 'addPoint2', function( data ) {
-		connection.connect();
-		connection.query( 'INSERT INTO game(c1,c2) value("bla", "bla2")' , function(err, rows, fields) {
-			if (err) throw err; });
+	this.socket.on( 'endGame', function( data ) {
+		console.log( '---------- endGame --------' );
+		connection.query( 'SELECT * FROM game WHERE id=' + data.gameId , function( err, rows, fields) {
+			if (err) throw err;
+			if( rows[0].score1 == END_GAME_POINTS ) {
+				connection.query( 'UPDATE teams SET active=0 WHERE id=' + rows[0].team2, function( err, rows, fields) {
+					if (err) throw err;
+					console.log( 'winning team 1' );
+				});
+			} else if( rows[0].score2 == END_GAME_POINTS ) {
+				connection.query( 'UPDATE teams SET active=0 WHERE id=' + rows[0].team1, function( err, rows, fields) {
+					if (err) throw err;
+					that.endGame = true;
+					console.log( 'winning team 2' );
+				});
+			} else {
+				console.log( 'no one wins' );
+				console.log( that.endGame );
+			}
+		});
 
-		self.socket.emit( 'add2', { team : '1'} );
+		console.log( that.endGame );
+		dataEmit = {
+			'gameId' : data.gameId
+		}
+		console.log( dataEmit );
+		self.socket.emit( 'endGame', dataEmit );
+		self.socket.broadcast.emit( 'endGame', dataEmit );
 
 	} )
 }

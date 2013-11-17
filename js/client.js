@@ -6,3 +6,9 @@ socket.on('addPoint', function (data) {
 	$span =  $('div').find( '[data-id='+ data.gameId +']').find( '.' + data.score );
 	$span.text( parseInt( $span.text(), 10 ) + 1 );
 });
+
+socket.on('endGame', function (data) {
+	console.log( data );
+	$span =  $('div').find( '[data-id='+ data.gameId +']');
+	$span.css( { 'background-color' : 'red'} );
+});
