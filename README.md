@@ -1,7 +1,9 @@
 malhando
 ========
 
-This is supposed to be a app to manage a malha tournament
+This is supposed to be a app to manage a "malha" tournament
+This is a work on progress
+It is in an init state so... Code sucks, implementation sucks, organization sucks and probably you suck... But somethings are working!
 
 Using
 ======
