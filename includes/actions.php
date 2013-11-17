@@ -201,6 +201,73 @@ function printGames()
 	echo $html;
 }
 
+function printRunningGames()
+{
+	$db = new db( unserialize( DATABASE ) );
+	$query = "
+		SELECT * FROM game
+	";
+	$db->query( $query );
+	$allGames = $db->get();
+
+	$currentStep = end($allGames);
+	$currentStep = $currentStep->step;
+
+	$query = "
+		SELECT * FROM game
+		WHERE step = '{$currentStep}'
+	";
+
+	$db->query( $query );
+	$games = $db->get();
+
+	$html = '';
+	switch ( $currentStep ) {
+		case 1: $html .= "<h1>STEP 1 </h1>";
+			$html .= "<div class='row'>";
+			break;
+		case 2: $html .= "<h1>STEP 2 </h1>";
+			$html .= "<div class='row'>";
+			break;
+		case 3: $html .= "<h1>STEP 3 </h1>";
+			$html .= "<div class='row'>";
+			break;
+		case 4: $html .= "<h1>STEP 4 </h1>";
+			$html .= "<div class='row'>";
+			break;
+		case 5: $html .= "<h1>FINAL</h1>";
+			$html .= "<div class='row'>";
+			break;
+	}
+
+	foreach( $games as $match ) {
+		if( $match->step != $currentStep ) {
+			continue;
+		}
+
+		$query = "
+			SELECT * FROM teams
+			WHERE id='{$match->team1}' OR id='{$match->team2}'
+		";
+
+		$db->query( $query );
+		$names = $db->get();
+
+		$html .= "<div class='js-game col-md-3' data-id='{$match->id}'>";
+			$html .= "<p>";
+				$html .= "Team 1 - " . $names[0]->name;
+				$html .= "  <span class='js-team-1 score1'>{$match->score1}</span>";
+			$html .= "</p>";
+			$html .= "<p>";
+				$html .= "Team 2 - " . $names[1]->name;
+				$html .= "  <span class='js-team-2 score2'>{$match->score2}</span>";
+			$html .= "</p>";
+		$html .= "</div>";
+	}
+
+	echo $html;
+}
+
 function printGamesAdmin()
 {
 	$db = new db( unserialize( DATABASE ) );

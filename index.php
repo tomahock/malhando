@@ -8,7 +8,7 @@
 
 	require_once( 'layout/header.php');
 
-	printGames();
+	printRunningGames();
 
 	require_once( 'layout/footer.php');
 ?>
