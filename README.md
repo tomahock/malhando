@@ -34,14 +34,14 @@ This is necessary because node.JS can't parse php so nginx parses php for node.J
 Working
 ======
  - Add teams :)
- - Not fully tested after the 32 teams inserted on admin page (yeah /admin.php with no authentication process) it can generate all games randomly.
- - On admin page -> Scores you can add add a score point for a team and it propagates to all clients with index page open.
+ - Add Point
+ - End Game
+ - Live score and end game
+ - All games successfully generated randomly
 
 TODO
 ======
  - better of 3 game
- - end game
- - generate second step
  - cool design (?)
  - replace mysql to mongodb
  - remove all php
