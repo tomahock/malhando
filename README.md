@@ -41,3 +41,4 @@ TODO
  - end game
  - generate second step
  - cool design (?)
+ - replace mysql to mongodb
