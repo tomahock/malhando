@@ -35,13 +35,14 @@ Working
 ======
  - Add teams :)
  - Add Point
- - End Game
+ - End heat
+ - ~~End Game~~
  - Live score and end game
  - All games successfully generated randomly
 
 TODO
 ======
- - better of 3 game
+ - ~~ heats game ~~
  - cool design (?)
  - replace mysql to mongodb
  - remove all php

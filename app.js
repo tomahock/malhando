@@ -55,9 +55,12 @@ function Game( socket ) {
 	var self = this;
 
 	this.socket.on( 'addPoint', function( data ) {
+		console.log( '---------- addPoint --------' );
 		var instance = this;
 
-		sql = 'UPDATE game SET ' + data.score + '=' + data.score + ' + 1 WHERE id=' + data.gameId;
+		console.log(  data );
+		sql = 'UPDATE game_has_matchs SET ' + data.score + '= (' + data.score + ' + 1 ) WHERE id=' + data.heatId;
+		console.log( sql );
 		connection.query( sql , function( err, rows, fields) {
 			console.log( rows );
 		});
@@ -67,26 +70,28 @@ function Game( socket ) {
 	} );
 	this.socket.on( 'endGame', function( data ) {
 		console.log( '---------- endGame --------' );
-		connection.query( 'SELECT * FROM game WHERE id=' + data.gameId , function( err, rows, fields) {
+		connection.query( 'SELECT * FROM game_has_matchs WHERE game_id=' + data.gameId + ' AND heat=' + data.heatId , function( err, rows, fields) {
 			if (err) throw err;
 			if( rows[0].score1 == END_GAME_POINTS ) {
 				connection.query( 'UPDATE teams SET active=0 WHERE id=' + rows[0].team2, function( err, rows, fields) {
 					if (err) throw err;
-					console.log( 'winning team 1' );
+					console.log( 'desactivate team 2' );
 				});
 			} else if( rows[0].score2 == END_GAME_POINTS ) {
 				connection.query( 'UPDATE teams SET active=0 WHERE id=' + rows[0].team1, function( err, rows, fields) {
 					if (err) throw err;
-					that.endGame = true;
-					console.log( 'winning team 2' );
+					console.log( 'desactivate team 1' );
 				});
 			} else {
 				console.log( 'no one wins' );
-				console.log( that.endGame );
 			}
+			connection.query( 'UPDATE game_has_matchs SET active=0 WHERE id=' + rows[0].id, function( err, rows, fields) {
+				if (err) throw err;
+				console.log( 'desactivate heat' );
+			});
+
 		});
 
-		console.log( that.endGame );
 		dataEmit = {
 			'gameId' : data.gameId
 		}
@@ -95,4 +100,53 @@ function Game( socket ) {
 		self.socket.broadcast.emit( 'endGame', dataEmit );
 
 	} )
+
+	this.socket.on( 'endHeat', function( data )
+	{
+		console.log( '---------- endHeat --------' );
+		connection.query( 'UPDATE game_has_matchs SET active=0 WHERE id=' + data.heatId, function( err, rows, fields ) {
+			if (err) throw err;
+			connection.query( 'SELECT * FROM game_has_matchs WHERE id=' + data.heatId, function( err, rows, fields) {
+				if (err) throw err;
+				sql = "UPDATE game SET ";
+				if( rows[0].score1 >= 9 ) {
+					sql += 'victories1 = victories1 + 1';
+				} else if(  rows[0].score2 >= 9 ) {
+					sql += 'victories2 = victories2 + 1';
+				} else {
+					console.log( 'no points to finish heat' );
+				}
+				sql += " WHERE id=" + rows[0].game_id;
+
+				console.log( sql );
+				connection.query( sql, function( err, rows, fields) {
+					if (err) throw err;
+					console.log( 'updated game' );
+				});
+				nextHeat = parseInt( rows[0].heat, 10 ) + 1;
+				if( nextHeat <=3 ) {
+					connection.query( 'INSERT INTO game_has_matchs(game_id, score1, score2, heat, active) VALUES(' + rows[0].game_id + ', 0, 0, ' + nextHeat +  ', 1 )', function( err, rows, fields) {
+						if (err) throw err;
+						console.log( 'inserting new match');
+					});
+
+					connection.query( 'SELECT * FROM game_has_matchs WHERE game_id=' + rows[0].game_id + ' AND heat=' + nextHeat, function( err, rows, fields ) {
+						if (err) throw err;
+
+						dataEmit = {
+							gameId : rows[0].game_id,
+							heatId : rows[0].id
+						}
+
+						self.socket.emit( 'endHeat', dataEmit );
+						self.socket.broadcast.emit( 'endHeat', dataEmit );
+					} )
+				}
+
+				data = {
+
+				}
+			} );
+		} );
+	});
 }

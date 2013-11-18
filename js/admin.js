@@ -65,15 +65,16 @@ socket.on('add2', function (data) {
 	console.log(data);
 });
 
-
 $('.js-add-point').on('click', function(e){
 	$this = $(e.currentTarget);
 	gameId = $this.parent().parent().data( 'id' );
+	heatId = $this.parent().parent().data( 'heat-id' );
 	teamId = $this.data( 'team-id' );
 	score = $this.data( 'score' );
 	console.log( 'click' );
 	data = {
 		'gameId' :gameId,
+		'heatId' :heatId,
 		'team' : teamId,
 		'score' : score
 	}
@@ -89,4 +90,16 @@ $('.js-end-game').on('click', function(e){
 		'gameId' :gameId
 	}
 	socket.emit( 'endGame', data );
+});
+
+$('.js-end-heat').on('click', function(e){
+	$this = $(e.currentTarget);
+	gameId = $this.parent().parent().find('.js-game-id').data( 'id' );
+	heatId = $this.parent().parent().find('.js-game-id').data( 'heat-id' );
+	console.log( 'click' );
+	data = {
+		'gameId' :gameId,
+		'heatId' : heatId
+	}
+	socket.emit( 'endHeat', data );
 });
