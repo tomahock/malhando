@@ -1,4 +1,4 @@
-SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+QUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
 
@@ -27,6 +27,8 @@ CREATE  TABLE IF NOT EXISTS `malha`.`game` (
   `team1` INT NOT NULL ,
   `team2` INT NOT NULL ,
   `step` INT NOT NULL ,
+  `victories1` INT NOT NULL DEFAULT 0 ,
+  `victories2` INT NOT NULL DEFAULT 0 ,
   PRIMARY KEY (`id`) ,
   INDEX `team1_idx` (`team1` ASC) ,
   INDEX `team2_idx` (`team2` ASC) ,
@@ -51,7 +53,8 @@ CREATE  TABLE IF NOT EXISTS `malha`.`game_has_matchs` (
   `game_id` INT NOT NULL ,
   `score1` INT NOT NULL DEFAULT 0 ,
   `score2` INT NOT NULL DEFAULT 0 ,
-  `match` INT NOT NULL DEFAULT 1 ,
+  `heat` INT NOT NULL DEFAULT 1 ,
+  `active` TINYINT NOT NULL DEFAULT 1 ,
   PRIMARY KEY (`id`) ,
   INDEX `game_id_idx` (`game_id` ASC) ,
   CONSTRAINT `game_id`
