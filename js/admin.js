@@ -84,10 +84,12 @@ $('.js-add-point').on('click', function(e){
 
 $('.js-end-game').on('click', function(e){
 	$this = $(e.currentTarget);
+	heatId = $this.parent().parent().find('.js-game-id').data( 'heat-id' );
 	gameId = $this.parent().parent().find('.js-game-id').data( 'id' );
 	console.log( 'click' );
 	data = {
-		'gameId' :gameId
+		'gameId' :gameId,
+		'heatId' : heatId
 	}
 	socket.emit( 'endGame', data );
 });

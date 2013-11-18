@@ -70,8 +70,9 @@ function Game( socket ) {
 	} );
 	this.socket.on( 'endGame', function( data ) {
 		console.log( '---------- endGame --------' );
-		connection.query( 'SELECT * FROM game_has_matchs WHERE game_id=' + data.gameId + ' AND heat=' + data.heatId , function( err, rows, fields) {
+		connection.query( 'SELECT * FROM game INNER JOIN game_has_matchs ON game.id=game_has_matchs.game_id WHERE game.id=' + data.gameId , function( err, rows, fields) {
 			if (err) throw err;
+			console.log( rows );
 			if( rows[0].score1 == END_GAME_POINTS ) {
 				connection.query( 'UPDATE teams SET active=0 WHERE id=' + rows[0].team2, function( err, rows, fields) {
 					if (err) throw err;
@@ -85,7 +86,7 @@ function Game( socket ) {
 			} else {
 				console.log( 'no one wins' );
 			}
-			connection.query( 'UPDATE game_has_matchs SET active=0 WHERE id=' + rows[0].id, function( err, rows, fields) {
+			connection.query( 'UPDATE game_has_matchs SET active=0 WHERE id=' + data.heatId, function( err, rows, fields) {
 				if (err) throw err;
 				console.log( 'desactivate heat' );
 			});
@@ -134,18 +135,30 @@ function Game( socket ) {
 						if (err) throw err;
 
 						dataEmit = {
+							endGame : false,
 							gameId : rows[0].game_id,
 							heatId : rows[0].id
 						}
 
 						self.socket.emit( 'endHeat', dataEmit );
 						self.socket.broadcast.emit( 'endHeat', dataEmit );
+
+						return true;
 					} )
+				} else {
+					dataEmit = {
+						endGame : true,
+						gameId :data.gameId,
+						heatId : null
+					}
+
+
+					self.socket.emit( 'endHeat', dataEmit );
+					self.socket.broadcast.emit( 'endHeat', dataEmit );
+
+					return true;
 				}
 
-				data = {
-
-				}
 			} );
 		} );
 	});
