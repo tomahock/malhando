@@ -36,13 +36,13 @@ Working
  - Add teams :)
  - Add Point
  - End heat
- - ~~End Game~~
+ - End Game
  - Live score and end game
  - All games successfully generated randomly
 
 TODO
 ======
- - ~~ heats game ~~
+ - ~~heats game~~
  - cool design (?)
  - replace mysql to mongodb
  - remove all php
